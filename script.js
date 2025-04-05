@@ -1,26 +1,26 @@
-const API_KEY="f53b4a5babb24f3896e1c4fa6d2beb95";
-const url="https://newsapi.org/v2/everything?q=";
+const API_KEY = "f53b4a5babb24f3896e1c4fa6d2beb95";
+const url = "https://newsapi.org/v2/everything?q=";
 
-window.addEventListener("load",()=> fetchNews("Technology"));
+window.addEventListener("load", () => fetchNews("Technology"));
 
 async function fetchNews(query) {
-    const res=await fetch(`${url}${query}&apiKey=${API_KEY}`);
-    const data=await res.json();
+    const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
+    const data = await res.json();
     bindData(data.articles);
 }
 
 function bindData(articles) {
-    const cardContainer=document.getElementById("cardscontainer");
-    const newsCardTemplate=document.querySelector("#template-news-card");
+    const cardsContainer = document.getElementById("cardscontainer");
+    const newsCardTemplate = document.getElementById("template-news-card");
 
-    cardContainer.innerHTML="";
+    cardsContainer.innerHTML = "";
 
-    articles.forEach((articles)=> {
-        if(!articles.urlToImage) return;
+    articles.forEach((article) => {
+        if (!article.urlToImage) return;
 
-        const cardClone =newsCardTemplate.content.cloneNode(true);
-        filldataInCard(cardClone, articles);
-        cardscontainer.appendChild(cardClone);
+        const cardClone = newsCardTemplate.content.cloneNode(true);
+        fillDataInCard(cardClone, article);
+        cardsContainer.appendChild(cardClone);
     })
 }
 
@@ -38,8 +38,27 @@ function fillDataInCard(cardClone, article) {
 
     newsSource.innerHTML = `${article.source.name} · ${date}`;
 
-    cardClone.firstElementChild.addEventListener("click", () => {
+    cardClone.addEventListener("click", () => {
         window.open(article.url, "_blank");
     })
-
 }
+
+let curSelectedNav = null;
+function onNavItemClick(id) {
+    fetchNews(id);
+    const navItem = document.getElementById(id);
+    curSelectedNav?.classList.remove("active");
+    curSelectedNav = navItem;
+    curSelectedNav.classList.add("active");
+}
+
+const searchButton = document.getElementById("search-button");
+const searchText = document.getElementById("search-text");
+
+searchButton.addEventListener("click", () => {
+    const query = searchText.value;
+    if (!query) return;
+    fetchNews(query);
+    curSelectedNav?.classList.remove("active");
+    curSelectedNav = null;
+})
